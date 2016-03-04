@@ -2,12 +2,10 @@
 
 defined( 'ABSPATH' ) or die();
 
-define( 'RRT_CONNECTION_FILE_PATH', dirname( __FILE__ ) . '/resourceconnections/' );
 
 class Resourcespace_Resource_Tracking {
 
-	private static $resource_file_ending = '.json';
-
+	const RESOURCE_FILE_ENDING = '.json';
 
 	function __construct() {
 		add_action( 'save_post', array( $this, 'rrt_resource_published' ), 10, 3 );
@@ -69,10 +67,15 @@ class Resourcespace_Resource_Tracking {
 		if ( isset( $connections ) && isset( $connections[0]['resource_id'] ) ) {
 			// Extract resource id
 			$resource_id = $connections[0]['resource_id'];
-			// Write to file
-			$file = fopen( RRT_CONNECTION_FILE_PATH . $resource_id . self::$resource_file_ending, 'w' );
-			fwrite( $file, json_encode( $connections ) );
-			fclose( $file );
+
+			$file_path = get_option( 'rrt_connections_file_path' );
+
+			if ( $file_path ) {
+				// Write to file
+				$file = fopen( $file_path . $resource_id . self::RESOURCE_FILE_ENDING, 'w' );
+				fwrite( $file, json_encode( $connections ) );
+				fclose( $file );
+			}
 		}
 	}
 
@@ -227,7 +230,11 @@ class Resourcespace_Resource_Tracking {
 	private function read_resource_connection( $resource_id ) {
 		$current_connection = array();
 
-		$file_path = RRT_CONNECTION_FILE_PATH . $resource_id . self::$resource_file_ending;
+		$dir_path = get_option( 'rrt_connections_file_path' );
+
+		if ( $dir_path ) {
+			$file_path = $dir_path . $resource_id . self::RESOURCE_FILE_ENDING;
+		}
 
 		if ( file_exists( $file_path ) ) {
 			$str = file_get_contents( $file_path );

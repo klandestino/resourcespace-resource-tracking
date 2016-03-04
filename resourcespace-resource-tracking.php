@@ -6,12 +6,18 @@ Description: Keep track of which resource in Resourcespace is used in which post
 Version: 0.1
 Author: Tom Bergman
 License: GPL2
+Text Domain: resourcespacetracking
+Domain Path: /languages
 */
 
 require_once dirname( __FILE__ ) . '/class-resourcespace-resource-tracking.php';
+require_once dirname( __FILE__ ) . '/class-resourcespace-resource-tracking-admin.php';
 
 // Initalize for WP save_post action
 $rrt = new Resourcespace_Resource_Tracking();
+
+// WP admin setup
+Resourcespace_Resource_Tracking_Admin::get_instance();
 
 // WP-rest init
 add_action( 'rest_api_init', 'rrt_api_tracking_setup' );
